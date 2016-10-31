@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1366</width>
+    <height>749</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>AOI</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <widget class="VisionView" name="visionView">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>260</y>
+      <width>640</width>
+      <height>480</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="VisionViewToolBox" name="visionViewToolBox" native="true">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>269</y>
+      <width>50</width>
+      <height>461</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="ModuleSelectForm" name="moduleSelectWidget" native="true">
+    <property name="geometry">
+     <rect>
+      <x>1260</x>
+      <y>30</y>
+      <width>100</width>
+      <height>671</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QStackedWidget" name="menuContainer">
+    <property name="geometry">
+     <rect>
+      <x>710</x>
+      <y>40</y>
+      <width>551</width>
+      <height>541</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <widget class="AutoOperationForm" name="autoOpForm"/>
+    <widget class="ProgramMainForm" name="pgmOpForm"/>
+    <widget class="ProgramManagementForm" name="pgmManageForm"/>
+   </widget>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>VisionView</class>
+   <extends>QLabel</extends>
+   <header>visionview.h</header>
+  </customwidget>
+  <customwidget>
+   <class>VisionViewToolBox</class>
+   <extends>QWidget</extends>
+   <header>visionviewtoolbox.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ModuleSelectForm</class>
+   <extends>QWidget</extends>
+   <header>ModuleSelectForm.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>AutoOperationForm</class>
+   <extends>QWidget</extends>
+   <header>autooperationform.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ProgramMainForm</class>
+   <extends>QWidget</extends>
+   <header>programmainform.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ProgramManagementForm</class>
+   <extends>QWidget</extends>
+   <header location="global">programmanagementform.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

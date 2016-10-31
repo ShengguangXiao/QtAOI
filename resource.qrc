@@ -1,0 +1,18 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Image/ZoomIn1.png</file>
+        <file>Image/ZoomIn2.png</file>
+        <file>Image/ZoomOut.png</file>
+        <file>Image/Auto_TopMenu.png</file>
+        <file>Image/Program_TopMenu.png</file>
+        <file>Image/Configure_TopMenu.png</file>
+        <file>Image/System_TopMenu.png</file>
+        <file>Image/Utility_TopMenu.png</file>
+        <file>Image/Maintenance_TopMenu.png</file>
+        <file>Image/StartAuto.png</file>
+        <file>Image/StopAuto.png</file>
+        <file>Image/ProgramManagement.png</file>
+        <file>Image/ClosedMenuTree.png</file>
+        <file>Image/OpenedMenuTree.png</file>
+    </qresource>
+</RCC>
