@@ -1,0 +1,8 @@
+*.sdf
+*.pdb
+*.ilk
+*.exe
+Debug
+Release
+*.opensdf
+GeneratedFiles
