@@ -5,6 +5,7 @@
 #include <QMouseEvent>
 #include <QTimer>
 #include <vector>
+#include <memory>
 
 #include "opencv2/core/core.hpp"
 #include "opencv/cv.h"
@@ -46,8 +47,7 @@ public:
         LEARNING,
         ADD_MASK
     };
-
-
+    
     //explicit VisionView(QLabel *parent = 0);
     explicit VisionView(QWidget *parent = 0, Qt::WindowFlags f=0);
     ~VisionView();
@@ -66,27 +66,27 @@ protected:
     void _drawLearnWindow(Mat &mat);
 
 private:
-    Rect                _rectLrnWindow;
-    Rect                _rectSrchWindow;
-    bool                _bLeftButtonDown;
-    cv::Point           _ptLeftClickStartPos;
-    cv::Point           _ptLeftClickEndPos;
-    int                 _nState;
-    cv::Mat             _mat;
-    cv::Mat             _matMask;
-    vector<Rect>        _vecRectMask;
-    float               _fZoomFactor;
-    QTimer*             _pTimer;
-    short               _nCameraID;
-    MASK_EDIT_STATE     _enMaskEditState;
-    MASK_SHAPE          _enMaskShape;
-    vector<cv::Point>   _vecPolylinePoint;
+    Rect                            _rectLrnWindow;
+    Rect                            _rectSrchWindow;
+    bool                            _bLeftButtonDown;
+    cv::Point                       _ptLeftClickStartPos;
+    cv::Point                       _ptLeftClickEndPos;
+    int                             _nState;
+    cv::Mat                         _mat;
+    cv::Mat                         _matMask;
+    vector<Rect>                    _vecRectMask;
+    float                           _fZoomFactor;
+    std::unique_ptr<QTimer>         _pTimer;
+    short                           _nCameraID;
+    MASK_EDIT_STATE                 _enMaskEditState;
+    MASK_SHAPE                      _enMaskShape;
+    vector<cv::Point>               _vecPolylinePoint;
 
-    const cv::Scalar    _colorLrnWindow = Scalar ( 0, 255, 0 );
-    const cv::Scalar    _colorMask = Scalar ( 255, 0, 0 );
-    const float         _constMaxZoomFactor = 4.f;
-    const float         _constMinZoomFactor = 0.25;
-    DialogEditMask      *_pDialogEditMask;
+    const cv::Scalar                _colorLrnWindow = Scalar ( 0, 255, 0 );
+    const cv::Scalar                _colorMask = Scalar ( 255, 0, 0 );
+    const float                     _constMaxZoomFactor = 4.f;
+    const float                     _constMinZoomFactor = 0.25;
+    std::unique_ptr<DialogEditMask> _pDialogEditMask;
 signals:
 
 protected slots:

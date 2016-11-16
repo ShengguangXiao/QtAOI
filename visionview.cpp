@@ -10,8 +10,8 @@ VisionView::VisionView(QWidget *parent , Qt::WindowFlags f)
     this->setParent(parent, f);
     _nState = LEARNING;
 
-    _pTimer = new QTimer(this);
-    connect( _pTimer, SIGNAL(timeout()), this, SLOT(updateMat()));
+    _pTimer = std::make_unique<QTimer>(this);
+    connect( _pTimer.get(), SIGNAL(timeout()), this, SLOT(updateMat()));
     _pTimer->start(20);
 
     setContextMenuPolicy(Qt::CustomContextMenu);
@@ -23,19 +23,12 @@ VisionView::VisionView(QWidget *parent , Qt::WindowFlags f)
     _enMaskEditState = MASK_EDIT_NONE;
     _enMaskShape = MASK_SHAPE_RECT;
     _enMaskEditState = MASK_EDIT_ADD;
-    _pDialogEditMask = NULL;
     _ptLeftClickStartPos = Point(0,0);
     _ptLeftClickEndPos = Point(0,0);
 }
 
 VisionView::~VisionView()
 {
-    delete _pTimer;
-    if ( _pDialogEditMask != NULL )
-    {
-        delete _pDialogEditMask;
-        _pDialogEditMask = NULL;
-    }
 }
 
 int VisionView::updateMat()
@@ -258,7 +251,7 @@ void VisionView::addMask()
     }
 
     if ( ! _pDialogEditMask)    {
-        _pDialogEditMask = new DialogEditMask(this);
+        _pDialogEditMask = std::make_unique<DialogEditMask>(this);
         _pDialogEditMask->setVisionView(this);
     }
 

@@ -6,3 +6,4 @@ Debug
 Release
 *.opensdf
 GeneratedFiles
+*.suo
