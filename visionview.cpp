@@ -34,47 +34,9 @@ VisionView::~VisionView()
 int VisionView::updateMat()
 {
     cv::Mat mat;
-
     AOI::Vision::WebCameraManager::GetInstance()->GrabImage ( _nCameraID, mat );
-
     _mat = mat;
-
-    Mat display ( mat.size(), mat.type() );
-    mat.copyTo( display );
-    if ( ! IsEuqal ( _fZoomFactor, 1.0f ) )
-    {
-        cv::Mat matZoomResult;
-        cv::resize( display, matZoomResult, cv::Size(), _fZoomFactor, _fZoomFactor );
-        if ( _fZoomFactor > 1.0f )  {
-            cv::Rect rectROI( ( matZoomResult.cols - display.cols ) / 2, ( matZoomResult.rows - display.rows ) / 2, display.cols, display.rows );
-            cv::Mat matROI ( matZoomResult,  rectROI );
-            matROI.copyTo(display);
-        }else   {
-            cv::Rect rectROI( ( display.cols - matZoomResult.cols ) / 2, ( display.rows - matZoomResult.rows ) / 2, matZoomResult.cols, matZoomResult.rows );
-            cv::Mat matTemp = cv::Mat::zeros( display.rows, display.cols, display.type());
-            cv::Mat matROI ( matTemp, rectROI );
-            matZoomResult.copyTo(matROI);
-            matTemp.copyTo(display);
-        }
-        //if ( _fZoomFactor > 1.0f )  {
-        //    pyrUp ( display, display, Size( mat.cols * 2, mat.rows * 2 ) );
-        //    if ( _fZoomFactor > 2.0f )
-        //        pyrUp ( display, display, Size( display.cols * 2, display.rows * 2 ) );
-        //}
-        //else if ( _fZoomFactor < 1.0f ) {
-        //    pyrDown( display, display, Size( mat.cols * 0.5, mat.rows * 0.5 ) );
-        //    if ( _fZoomFactor < 0.5f )
-        //        pyrDown( display, display, Size( display.cols * 0.5, display.rows * 0.5 ) );
-        //}
-    }
-    cvtColor( display, display, CV_BGR2RGB);
-
-    _drawLearnWindow ( display );
-
-    QImage image = QImage((uchar*) display.data, display.cols, display.rows, display.step, QImage::Format_RGB888);
-
-    //show Qimage using QLabel
-    setPixmap(QPixmap::fromImage(image));
+    _drawDisplay();
     return OK;
 }
 
@@ -187,7 +149,7 @@ void VisionView::setMachineState(int nMachineState)
     _nState = nMachineState;
 }
 
-void VisionView::_drawLearnWindow(Mat &mat)
+void VisionView::_drawLearnWindow(cv::Mat &mat)
 {
     cv::rectangle ( mat, _rectLrnWindow, _colorLrnWindow, 2 );
 
@@ -210,8 +172,7 @@ void VisionView::_drawLearnWindow(Mat &mat)
             cv::line( mat, _ptLeftClickStartPos, _ptLeftClickEndPos, Scalar ( 255, 0, 0 ), 1 );
     }
 
-    cv::Mat copy ( mat.size(), mat.type() );
-    mat.copyTo ( copy );
+    cv::Mat copy = mat.clone();
 
     if ( ! _matMask.empty() )
         copy.setTo ( Scalar(255, 0, 0), _matMask );
@@ -220,8 +181,56 @@ void VisionView::_drawLearnWindow(Mat &mat)
     cv::addWeighted ( copy, alpha, mat, 1.0 - alpha, 0.0, mat );
 }
 
+void VisionView::_drawDisplay()
+{
+    auto displayWidth = this->size().width();
+    auto displayHeight = this->size().height();
+    cv::Mat matZoomResult;
+    if ( ! IsEuqal ( _fZoomFactor, 1.0f ) )       
+        cv::resize( _mat, matZoomResult, cv::Size(), _fZoomFactor, _fZoomFactor );        
+    else
+        matZoomResult = _mat.clone();
+
+    _matDisplay = cv::Mat::ones( displayHeight, displayWidth, _mat.type() ) * 255;
+    _matDisplay.setTo(cv::Scalar(255,255,255));
+
+    if (matZoomResult.cols > displayWidth && matZoomResult.rows > displayHeight)  {
+        cv::Rect rectROI((matZoomResult.cols - displayWidth) / 2, (matZoomResult.rows - displayHeight) / 2, displayWidth, displayHeight);
+        cv::Mat matROI(matZoomResult, rectROI);
+        _matDisplay = matROI;
+    }
+    else if (matZoomResult.cols > displayWidth && matZoomResult.rows < displayHeight)  {
+        cv::Rect rectROISrc( (matZoomResult.cols - displayWidth) / 2, 0, displayWidth, matZoomResult.rows);
+        cv::Mat matSrc(matZoomResult, rectROISrc);
+        cv::Rect rectROIDst(0, ( displayHeight - matZoomResult.rows ) / 2, displayWidth, matZoomResult.rows );
+        cv::Mat matDst(_matDisplay, rectROIDst);
+        matSrc.copyTo(matDst);
+    }else if (matZoomResult.cols < displayWidth && matZoomResult.rows > displayHeight)  {
+        cv::Rect rectROISrc(0, (matZoomResult.rows - displayHeight) / 2, matZoomResult.cols, displayHeight);
+        cv::Mat matSrc(matZoomResult, rectROISrc);
+        cv::Rect rectROIDst(( displayWidth - matZoomResult.cols ) / 2, 0, matZoomResult.cols, displayHeight );
+        cv::Mat matDst(_matDisplay, rectROIDst);
+        matSrc.copyTo(matDst);
+    }else if (matZoomResult.cols < displayWidth && matZoomResult.rows < displayHeight) {
+        cv::Rect rectROIDst((displayWidth - matZoomResult.cols) / 2, (displayHeight - matZoomResult.rows) / 2, matZoomResult.cols, matZoomResult.rows);
+        cv::Mat matDst(_matDisplay, rectROIDst);
+        matZoomResult.copyTo(matDst);
+    }else
+        _matDisplay = matZoomResult;
+
+    cvtColor( _matDisplay, _matDisplay, CV_BGR2RGB);
+
+    _drawLearnWindow ( _matDisplay );
+    QImage image = QImage((uchar*) _matDisplay.data, _matDisplay.cols, _matDisplay.rows, _matDisplay.step, QImage::Format_RGB888);
+    //show Qimage using QLabel
+    setPixmap(QPixmap::fromImage(image));
+}
+
 void VisionView::showContextMenu(const QPoint& pos) // this is a slot
 {
+    if ( _matDisplay.empty() )
+        return;
+
     QPoint globalPos = mapToGlobal(pos);
 
     QMenu contextMenu(tr("Context menu"), this);
@@ -245,10 +254,7 @@ void VisionView::addMask()
 {
     _nState = ADD_MASK;
     if ( _matMask.empty() )
-    {
-        _matMask = cv::Mat(_mat.size(), CV_8U );
-        _matMask.setTo(Scalar(0));
-    }
+        _matMask = cv::Mat(_mat.size(), CV_8UC1, cv::Scalar(0, 0, 0) );
 
     if ( ! _pDialogEditMask)    {
         _pDialogEditMask = std::make_unique<DialogEditMask>(this);

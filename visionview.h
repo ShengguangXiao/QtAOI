@@ -5,6 +5,7 @@
 #include <QMouseEvent>
 #include <QTimer>
 #include <vector>
+#include <string>
 #include <memory>
 
 #include "opencv2/core/core.hpp"
@@ -47,7 +48,7 @@ public:
         LEARNING,
         ADD_MASK
     };
-    
+
     //explicit VisionView(QLabel *parent = 0);
     explicit VisionView(QWidget *parent = 0, Qt::WindowFlags f=0);
     ~VisionView();
@@ -57,13 +58,16 @@ public:
     void zoomIn();
     void zoomOut();
     void restoreZoom();
+    void startTimer();
+    void setImageFile(const std::string &filePath);
     static float distanceOf2Point(const cv::Point &pt1, const cv::Point &pt2);
 protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void mouseDoubleClickEvent(QMouseEvent *event);
-    void _drawLearnWindow(Mat &mat);
+    void _drawDisplay();
+    void _drawLearnWindow(cv::Mat &mat);
 
 private:
     Rect                            _rectLrnWindow;
@@ -73,6 +77,7 @@ private:
     cv::Point                       _ptLeftClickEndPos;
     int                             _nState;
     cv::Mat                         _mat;
+	cv::Mat             			_matDisplay;
     cv::Mat                         _matMask;
     vector<Rect>                    _vecRectMask;
     float                           _fZoomFactor;
